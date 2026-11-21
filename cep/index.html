@@ -3,52 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <title>MCP Bridge</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #1e1e1e;
-      color: #ccc;
-      padding: 12px;
-      font-size: 12px;
-      margin: 0;
-    }
-    #status {
-      padding: 8px;
-      border-radius: 4px;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-    .connected { background: #1a3a1a; color: #4caf50; }
-    .disconnected { background: #3a1a1a; color: #f44336; }
-    .connecting { background: #3a3a1a; color: #ff9800; }
-    #log {
-      background: #111;
-      border: 1px solid #333;
-      border-radius: 4px;
-      padding: 8px;
-      height: 100px;
-      overflow-y: auto;
-      font-family: monospace;
-      font-size: 11px;
-      white-space: pre-wrap;
-    }
-    button {
-      background: #0078d4;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 3px;
-      cursor: pointer;
-      margin-top: 8px;
-    }
-    button:hover { background: #106ebe; }
-  </style>
+  <link rel="stylesheet" href="panel.css">
 </head>
 <body>
-  <div id="status" class="disconnected">Disconnected</div>
-  <div id="log"></div>
-  <button onclick="connect()">Reconnect</button>
+  <header class="bar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="5" cy="12" r="2.5"></circle>
+        <circle cx="19" cy="12" r="2.5"></circle>
+        <path d="M7.5 12h9"></path>
+        <path d="M12 7.5v9"></path>
+      </svg>
+      <span class="title">MCP Bridge</span>
+    </div>
+    <div id="status" class="status disconnected">
+      <span class="dot"></span>
+      <span class="status-label">Disconnected</span>
+    </div>
+  </header>
+
+  <div class="endpoint">
+    <span class="endpoint-label">Server</span>
+    <span class="endpoint-url">ws://localhost:<b id="port">8097</b></span>
+  </div>
+
+  <div class="log-wrap">
+    <div id="log" class="log" role="log" aria-live="polite" aria-label="Command log"></div>
+    <div id="logEmpty" class="log-empty">Waiting for commands…</div>
+  </div>
+
+  <footer class="controls">
+    <button id="reconnect" class="btn btn-primary" onclick="connect()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+        <path d="M21 3v4.5h-4.5"></path>
+      </svg>
+      Reconnect
+    </button>
+    <button id="clear" class="btn btn-ghost" onclick="clearLog()">Clear</button>
+    <span class="count"><b id="count">0</b> handled</span>
+  </footer>
+
   <script src="js/CSInterface.js"></script>
+  <script src="js/panel-ui.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

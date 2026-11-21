@@ -6,18 +6,13 @@ var cs = new CSInterface();
 var ws = null;
 var WS_PORT = 8097;
 
-function log(msg) {
-  var el = document.getElementById("log");
-  var time = new Date().toLocaleTimeString();
-  el.textContent += "[" + time + "] " + msg + "\n";
-  el.scrollTop = el.scrollHeight;
-}
+// log(), setStatus(), clearLog() live in panel-ui.js (loaded before this file).
 
-function setStatus(text, className) {
-  var el = document.getElementById("status");
-  el.textContent = text;
-  el.className = className;
-}
+// Reflect the real port in the endpoint strip.
+(function () {
+  var portEl = document.getElementById("port");
+  if (portEl) portEl.textContent = WS_PORT;
+})();
 
 var reconnectTimer = null;
 

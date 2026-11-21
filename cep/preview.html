@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MCP Bridge — Preview</title>
+  <link rel="stylesheet" href="panel.css">
+  <style>
+    /* Preview-only: frame the panel at a realistic docked width on a plain page. */
+    html, body { height: 100%; }
+    body {
+      overflow: auto;
+      background: #0e0e0e;
+      align-items: flex-start;
+    }
+    .preview-stage {
+      width: 300px;
+      max-width: 100%;
+      height: 100vh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid #000;
+      border-right: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-stage">
+    <header class="bar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="5" cy="12" r="2.5"></circle>
+          <circle cx="19" cy="12" r="2.5"></circle>
+          <path d="M7.5 12h9"></path>
+          <path d="M12 7.5v9"></path>
+        </svg>
+        <span class="title">MCP Bridge</span>
+      </div>
+      <div id="status" class="status disconnected">
+        <span class="dot"></span>
+        <span class="status-label">Disconnected</span>
+      </div>
+    </header>
+
+    <div class="endpoint">
+      <span class="endpoint-label">Server</span>
+      <span class="endpoint-url">ws://localhost:<b id="port">8097</b></span>
+    </div>
+
+    <div class="log-wrap">
+      <div id="log" class="log" role="log" aria-live="polite" aria-label="Command log"></div>
+      <div id="logEmpty" class="log-empty">Waiting for commands…</div>
+    </div>
+
+    <footer class="controls">
+      <button id="reconnect" class="btn btn-primary" onclick="connect()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+          <path d="M21 3v4.5h-4.5"></path>
+        </svg>
+        Reconnect
+      </button>
+      <button id="clear" class="btn btn-ghost" onclick="clearLog()">Clear</button>
+      <span class="count"><b id="count">0</b> handled</span>
+    </footer>
+  </div>
+
+  <script src="js/panel-ui.js"></script>
+  <script>
+    /* Mock driver — simulates a live MCP session for preview only. */
+    var id = 0;
+    var commands = [
+      "getActiveSequence", "getProjectItems", "importFile", "addClipToTimeline",
+      "setClipPosition", "applyEffect", "addMarker", "setAudioLevels",
+      "createCaptionTrack", "exportSequence", "getTimelineTracks", "renameClip"
+    ];
+    var streamTimer = null;
+
+    function fireCommand() {
+      var name = commands[Math.floor(Math.random() * commands.length)];
+      var myId = ++id;
+      log("← " + name + " (id: " + myId + ")");
+      setTimeout(function () {
+        if (Math.random() < 0.12) {
+          log("EvalScript error. (id: " + myId + ")");
+        } else {
+          log("→ response (id: " + myId + ")");
+        }
+      }, 320 + Math.random() * 500);
+    }
+
+    function startStream() {
+      if (streamTimer) return;
+      streamTimer = setInterval(fireCommand, 1500);
+    }
+
+    // connect() reruns the connecting -> connected handshake (the Reconnect button).
+    function connect() {
+      if (streamTimer) { clearInterval(streamTimer); streamTimer = null; }
+      setStatus("Connecting…", "connecting");
+      log("Connecting to MCP server on port 8097…");
+      setTimeout(function () {
+        setStatus("Connected", "connected");
+        log("Connected to MCP server");
+        startStream();
+      }, 1100);
+    }
+
+    // Pre-populate a connected session so a static screenshot shows the panel at work,
+    // then keep streaming live.
+    (function seed() {
+      setStatus("Connected", "connected");
+      log("panel build: cep-bridge-1");
+      log("Connected to MCP server");
+      ["getActiveSequence", "getProjectItems", "importFile", "applyEffect"].forEach(function (n) {
+        var myId = ++id;
+        log("← " + n + " (id: " + myId + ")");
+        log("→ response (id: " + myId + ")");
+      });
+      log("← exportSequence (id: " + (++id) + ")");
+      log("EvalScript error. (id: " + id + ")");
+      startStream();
+    })();
+  </script>
+</body>
+</html>
