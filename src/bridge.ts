@@ -10,6 +10,7 @@ const TIMEOUT_MS = 30000;
 const REBIND_MS = 3000;
 const RELAY_PATH = "/relay";
 const HOST = "127.0.0.1"; // never expose the bridge to the network
+const PANEL_ORIGIN = "file://"; // what CEP sends for the local panel
 
 // Relays can run any tool (including execute_extendscript), so they must prove
 // they are this OS user: the owner writes a random token to a file in the
@@ -142,8 +143,12 @@ function bind() {
         // Relays are Node processes: no browser Origin, and they hold the token.
         return !origin && !!ownerToken && req.headers["x-relay-token"] === ownerToken;
       }
-      // Panel: refuse ordinary web pages (cross-site WebSocket hijacking).
-      return !/^https?:/i.test(origin || "");
+      // Panel: only the CEP panel's exact origin (web pages, sandboxed "null"
+      // iframes and browser extensions send something else), and never while
+      // a live panel is attached -- a second one could steal commands/results.
+      // ponytail: a local file:// page could still pose as the panel when none
+      // is attached; a token needs CEP --enable-nodejs, add if that matters.
+      return origin === PANEL_ORIGIN && !isPanelAttached();
     },
   });
 
@@ -171,9 +176,13 @@ function bind() {
 
 bind();
 
+function isPanelAttached(): boolean {
+  return cepSocket !== null && cepSocket.readyState === WebSocket.OPEN;
+}
+
 export function isConnected(): boolean {
   if (relaySocket) return relaySocket.readyState === WebSocket.OPEN && ownerPanelConnected;
-  return cepSocket !== null && cepSocket.readyState === WebSocket.OPEN;
+  return isPanelAttached();
 }
 
 export function getPort(): number {
