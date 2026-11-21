@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    Version="7.0"
-                   ExtensionBundleId="com.mcp.premiere.bridge"
+                   ExtensionBundleId="com.premieremcpbridge.bridge"
                    ExtensionBundleName="MCP Bridge"
                    ExtensionBundleVersion="1.0.0">
 
   <ExtensionList>
-    <Extension Id="com.mcp.premiere.bridge.panel" Version="1.0.0" />
+    <Extension Id="com.premieremcpbridge.bridge.panel" Version="1.0.0" />
   </ExtensionList>
 
   <ExecutionEnvironment>
@@ -22,7 +22,7 @@
   </ExecutionEnvironment>
 
   <DispatchInfoList>
-    <Extension Id="com.mcp.premiere.bridge.panel">
+    <Extension Id="com.premieremcpbridge.bridge.panel">
       <DispatchInfo>
         <Resources>
           <MainPath>./index.html</MainPath>

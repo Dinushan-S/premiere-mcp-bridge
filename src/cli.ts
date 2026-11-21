@@ -13,7 +13,7 @@ import { fileURLToPath } from "url";
 const here = dirname(fileURLToPath(import.meta.url)); // dist/
 const pkgRoot = join(here, "..");
 const cepSrc = join(pkgRoot, "cep");
-const BUNDLE = "com.mcp.premiere.bridge";
+const BUNDLE = "com.premieremcpbridge.bridge";
 const CSXS_VERSIONS = [9, 10, 11, 12]; // Premiere 2023+ uses CEP 11/12; older kept harmless.
 
 function extensionsDir(): string {

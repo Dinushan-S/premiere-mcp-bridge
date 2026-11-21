@@ -1,6 +1,6 @@
 {
   "name": "premiere-mcp-bridge",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for Adobe Premiere Pro — control Premiere Pro from Claude, Codex, or any MCP client via 170+ tools over a local WebSocket + CEP bridge",
   "type": "module",
   "main": "dist/server.js",
@@ -21,7 +21,14 @@
     "dev": "tsc --watch",
     "prepare": "npm run build"
   },
-  "keywords": ["mcp", "premiere-pro", "adobe", "video-editing", "claude", "ai"],
+  "keywords": [
+    "mcp",
+    "premiere-pro",
+    "adobe",
+    "video-editing",
+    "claude",
+    "ai"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Dinushan-S/premiere-mcp-bridge.git"

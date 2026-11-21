@@ -177,9 +177,9 @@ Settings resolve in this order: **environment variables → `config.json` → de
 | Symptom | Fix |
 |---|---|
 | Panel stuck on **Disconnected** | Start your MCP client (it launches the server). The panel retries every 5s and connects automatically. |
-| **MCP Bridge** not in the Extensions menu | Run `premiere-mcp-bridge --install-cep`, then fully restart Premiere. Confirm with `--doctor`. |
+| **MCP Bridge** not in the Extensions menu | Run `premiere-mcp-bridge --install-cep`, then fully restart Premiere. Confirm with `--doctor`. Upgrading from 1.0.0? Its panel ID clashed with the `premiere-pro-mcp` extension; 1.0.1+ uses its own ID, so re-run `--install-cep`. |
 | `command not found` from the client | Ensure npm's global bin dir is on your PATH, or point the client at the absolute path to `dist/cli.js`. |
-| Port already in use | Another client already owns `8097` — close it, or change `port` in both `config.json` and the panel. |
+| Using several clients at once | Supported. The first server owns port `8097`; others relay through it automatically (e.g. Claude and Codex side by side). |
 | Tools time out | Keep the panel open and a project loaded; check the panel log for the ExtendScript error. |
 
 ---

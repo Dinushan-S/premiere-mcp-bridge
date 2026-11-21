@@ -8,7 +8,7 @@ reg add "HKCU\Software\Adobe\CSXS.12" /v PlayerDebugMode /t REG_SZ /d 1 /f
 echo [OK] Enabled CEP debug mode
 
 REM Create junction for CEP extension (works without admin/Developer Mode, unlike /D symlinks)
-set CEP_DIR=%APPDATA%\Adobe\CEP\extensions\com.mcp.premiere.bridge
+set CEP_DIR=%APPDATA%\Adobe\CEP\extensions\com.premieremcpbridge.bridge
 if not exist "%APPDATA%\Adobe\CEP\extensions" mkdir "%APPDATA%\Adobe\CEP\extensions"
 if exist "%CEP_DIR%" (
   rmdir "%CEP_DIR%"
