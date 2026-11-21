@@ -1,10 +1,40 @@
 import { WebSocketServer, WebSocket } from "ws";
+import { randomBytes } from "crypto";
+import { mkdirSync, readFileSync, writeFileSync } from "fs";
+import { homedir } from "os";
+import { join } from "path";
 import { loadConfig } from "./config.js";
 
 const WS_PORT = loadConfig().port;
 const TIMEOUT_MS = 30000;
 const REBIND_MS = 3000;
 const RELAY_PATH = "/relay";
+const HOST = "127.0.0.1"; // never expose the bridge to the network
+
+// Relays can run any tool (including execute_extendscript), so they must prove
+// they are this OS user: the owner writes a random token to a file in the
+// user's home and relays send it back. Web pages can't read that file.
+// ponytail: a local process that squats the port first could collect the token
+// from relays; a challenge/response would close that, add if multi-user hosts matter.
+const TOKEN_DIR = join(homedir(), ".premiere-mcp-bridge");
+const TOKEN_FILE = join(TOKEN_DIR, `relay-${WS_PORT}.token`);
+
+function writeToken(): string {
+  const token = randomBytes(32).toString("hex");
+  mkdirSync(TOKEN_DIR, { recursive: true, mode: 0o700 });
+  writeFileSync(TOKEN_FILE, token, { mode: 0o600 });
+  return token;
+}
+
+function readToken(): string {
+  try {
+    return readFileSync(TOKEN_FILE, "utf8").trim();
+  } catch {
+    return "";
+  }
+}
+
+let ownerToken = "";
 
 // Every MCP client (Claude, Codex, a second Claude window...) spawns its own
 // server, but only one can bind WS_PORT. That one is the OWNER: the Premiere
@@ -80,7 +110,9 @@ function handlePanel(ws: WebSocket) {
 }
 
 function connectAsRelay() {
-  const ws = new WebSocket(`ws://127.0.0.1:${WS_PORT}${RELAY_PATH}`);
+  const ws = new WebSocket(`ws://${HOST}:${WS_PORT}${RELAY_PATH}`, {
+    headers: { "x-relay-token": readToken() },
+  });
   ws.on("open", () => {
     relaySocket = ws;
     console.error(`[Bridge] Port ${WS_PORT} owned by another instance; relaying through it`);
@@ -102,7 +134,18 @@ function connectAsRelay() {
 }
 
 function bind() {
-  const server = new WebSocketServer({ port: WS_PORT });
+  const server = new WebSocketServer({
+    host: HOST,
+    port: WS_PORT,
+    verifyClient: ({ origin, req }: { origin: string; req: import("http").IncomingMessage }) => {
+      if (req.url === RELAY_PATH) {
+        // Relays are Node processes: no browser Origin, and they hold the token.
+        return !origin && !!ownerToken && req.headers["x-relay-token"] === ownerToken;
+      }
+      // Panel: refuse ordinary web pages (cross-site WebSocket hijacking).
+      return !/^https?:/i.test(origin || "");
+    },
+  });
 
   server.on("error", (err: NodeJS.ErrnoException) => {
     if (err.code === "EADDRINUSE") {
@@ -116,7 +159,8 @@ function bind() {
   });
 
   server.on("listening", () => {
-    console.error(`[Bridge] WebSocket server listening on port ${WS_PORT}`);
+    ownerToken = writeToken();
+    console.error(`[Bridge] WebSocket server listening on ${HOST}:${WS_PORT}`);
   });
 
   server.on("connection", (ws, req) => {

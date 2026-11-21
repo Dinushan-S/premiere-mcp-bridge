@@ -1,6 +1,6 @@
 {
   "name": "premiere-mcp-bridge",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "MCP server for Adobe Premiere Pro — control Premiere Pro from Claude, Codex, or any MCP client via 170+ tools over a local WebSocket + CEP bridge",
   "type": "module",
   "main": "dist/server.js",
