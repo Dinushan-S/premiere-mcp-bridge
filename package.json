@@ -22,6 +22,14 @@
     "prepare": "npm run build"
   },
   "keywords": ["mcp", "premiere-pro", "adobe", "video-editing", "claude", "ai"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dinushan-S/premiere-mcp-bridge.git"
+  },
+  "homepage": "https://github.com/Dinushan-S/premiere-mcp-bridge#readme",
+  "bugs": {
+    "url": "https://github.com/Dinushan-S/premiere-mcp-bridge/issues"
+  },
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
